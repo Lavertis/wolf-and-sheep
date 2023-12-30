@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct WolfAndSheepApp: App {
+    @StateObject var game = BoardViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(viewModel: game)
         }
     }
 }
