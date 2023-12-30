@@ -30,6 +30,10 @@ class BoardViewModel : ObservableObject {
         }
     }
     
+    func getCheckerColor(_ checker: BoardModel.Checker) -> Color {
+        return checker.type == .wolf ? Color.yellow : Color.green
+    }
+    
     func checker(at square: BoardModel.Square) -> BoardModel.Checker? {
         return model.checker(at: square)
     }
@@ -37,28 +41,6 @@ class BoardViewModel : ObservableObject {
     func squareAt(row: Int, column: Int) -> BoardModel.Square? {
         return model.squareAt(row: row, column: column)
     }
-    
-//    func onSquareTap(_ square: BoardModel.Square) {
-//        guard let selectedChecker = selectedChecker else {
-//            select(checker(at: square))
-//            return
-//        }
-//        
-//        if selectedChecker.row == square.row && selectedChecker.column == square.column {
-//            select(nil)
-//            return
-//        }
-//        
-//        if let newChecker = model.checkers.first(where: { $0.row == square.row && $0.column == square.column }) {
-//            select(newChecker)
-//            return
-//        }
-//        
-//        if model.canMove(selectedChecker, to: square) {
-//            move(selectedChecker, to: square)
-//            select(nil)
-//        }
-//    }
     
     func move(_ checker: BoardModel.Checker, to square: BoardModel.Square) {
         model.move(checker, to: square)
