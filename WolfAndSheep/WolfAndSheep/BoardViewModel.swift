@@ -18,13 +18,14 @@ class BoardViewModel : ObservableObject {
     
     var squares: Array<BoardModel.Square> { model.squares }
     var checkers: Array<BoardModel.Checker> { model.checkers }
+    var selectedChecker: BoardModel.Checker? { model.selectedChecker }
     
     func checker(at square: BoardModel.Square) -> BoardModel.Checker? {
         return model.checker(at: square)
     }
     
     func onSquareTap(_ square: BoardModel.Square) {
-        guard let selectedChecker = checkers.first(where: { $0.isSelected }) else {
+        guard let selectedChecker = selectedChecker else {
             select(checker(at: square))
             return
         }

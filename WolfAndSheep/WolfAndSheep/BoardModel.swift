@@ -16,7 +16,7 @@ struct BoardModel {
         checkers = createCheckers()
     }
     
-    func createSquares() -> Array<Square> {
+    private func createSquares() -> Array<Square> {
         var squares = Array<Square>()
         
         for row in 0 ..< 8 {
@@ -28,13 +28,13 @@ struct BoardModel {
         return squares
     }
     
-    func createCheckers() -> Array<Checker> {
+    private func createCheckers() -> Array<Checker> {
         var checkers = createSheepCheckers()
         checkers.append(createWolfChecker())
         return checkers
     }
     
-    func createSheepCheckers() -> Array<Checker> {
+    private func createSheepCheckers() -> Array<Checker> {
         var checkers = Array<Checker>()
         
         for column in stride(from: 1, to: 8, by: 2) {
@@ -44,7 +44,7 @@ struct BoardModel {
         return checkers
     }
     
-    func createWolfChecker() -> Checker {
+    private func createWolfChecker() -> Checker {
         return Checker(row: 7, column: 0, type: .wolf)
     }
     
@@ -82,18 +82,10 @@ struct BoardModel {
     }
     
     mutating func select(_ checker: Checker?) {
-        checkers.indices.forEach { checkers[$0].isSelected = false }
-        guard let checker = checker else {
-            return
-        }
-        
-        guard let index = checkers.firstIndex(of: checker) else {
-            return
-        }
-        
-        checkers[index].isSelected = true
-        print("Selected checker at row: \(checker.row), column: \(checker.column)")
+        selectedChecker = checker
     }
+    
+    var selectedChecker: Checker? = nil
     
     struct Square: Equatable, Identifiable {
         let row: Int
@@ -107,7 +99,6 @@ struct BoardModel {
     struct Checker: Equatable, Identifiable {
         let row: Int
         let column: Int
-        var isSelected: Bool = false
         let type: CheckerType
         
         var id: String {

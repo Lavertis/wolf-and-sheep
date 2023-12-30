@@ -19,13 +19,17 @@ struct ContentView: View {
         LazyVGrid(columns: columns, spacing: 0) {
             ForEach(viewModel.squares) { square in
                 let color = (square.row + square.column).isMultiple(of: 2) ? Color.orange : Color.black
-                let checker = viewModel.checker(at: square)
-                BoardSquare(
-                    color: color,
-                    checker: checker
-                )
+                BoardSquare(color: color)
                 .frame(width: squareSize(), height: squareSize())
                 .clipped()
+                .overlay {
+                    if let checker = viewModel.checker(at: square) {
+                        BoardChecker(
+                            color: checker.type == .wolf ? Color.yellow : Color.green,
+                            isHighlighted: viewModel.selectedChecker == checker
+                        )
+                    }
+                }
                 .onTapGesture {
                     viewModel.onSquareTap(square)
                 }
@@ -35,7 +39,7 @@ struct ContentView: View {
         .cornerRadius(5)
     }
     
-    func squareSize() -> CGFloat {
+    private func squareSize() -> CGFloat {
         let width = UIScreen.main.bounds.width
         return width / 8
     }
