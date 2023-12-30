@@ -20,14 +20,23 @@ class BoardViewModel : ObservableObject {
     var checkers: Array<BoardModel.Checker> { model.checkers }
     
     func checker(at square: BoardModel.Square) -> BoardModel.Checker? {
-        return model.checkers.first { $0.row == square.row && $0.column == square.column }
+        return model.checker(at: square)
     }
     
     func onSquareTap(_ square: BoardModel.Square) {
         if let selectedChecker = model.checkers.first(where: { $0.isSelected }) {
-            if selectedChecker.row != square.row || selectedChecker.column != square.column {
-                move(selectedChecker, to: square)
+            if selectedChecker.row == square.row && selectedChecker.column == square.column {
+                select(nil)
+                return
             }
+            if let nextChecker = model.checkers.first(where: { $0.row == square.row && $0.column == square.column }) {
+                select(nextChecker)
+                return
+            }
+            if !model.canMove(selectedChecker, to: square) {
+                return
+            }
+            move(selectedChecker, to: square)
             select(nil)
         } else {
             select(checker(at: square))
