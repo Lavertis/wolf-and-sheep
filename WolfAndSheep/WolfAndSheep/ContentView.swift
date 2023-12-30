@@ -18,8 +18,7 @@ struct ContentView: View {
     var body: some View {
         LazyVGrid(columns: columns, spacing: 0) {
             ForEach(viewModel.squares) { square in
-                let color = (square.row + square.column).isMultiple(of: 2) ? Color.orange : Color.black
-                BoardSquare(color: color)
+                BoardSquare(color: viewModel.getSquareColor(square))
                 .frame(width: squareSize(), height: squareSize())
                 .clipped()
                 .overlay {

@@ -20,6 +20,14 @@ class BoardViewModel : ObservableObject {
     var checkers: Array<BoardModel.Checker> { model.checkers }
     var selectedChecker: BoardModel.Checker? { model.selectedChecker }
     
+    func getSquareColor(_ square: BoardModel.Square) -> Color {
+        if let selectedChecker = selectedChecker, model.canMove(selectedChecker, to: square) {
+            return Color.teal
+        } else {
+            return (square.row + square.column).isMultiple(of: 2) ? Color.orange : Color.black
+        }
+    }
+    
     func checker(at square: BoardModel.Square) -> BoardModel.Checker? {
         return model.checker(at: square)
     }
