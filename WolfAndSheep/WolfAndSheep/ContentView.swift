@@ -11,51 +11,52 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var viewModel: BoardViewModel
+    @State private var dragOffset = CGSize.zero
+    var columns: [GridItem] { Array(repeating: GridItem(), count: viewModel.matrixSize) }
     
-    @State private var offset = CGSize.zero
+    func squareAtLocation(boardSize: CGFloat, location: CGPoint) -> BoardModel.Square? {
+        let squareSize = boardSize / CGFloat(viewModel.matrixSize)
+        let column = Int(location.x / squareSize)
+        let row = Int(location.y / squareSize)
+        return viewModel.squareAt(row: row, column: column)
+    }
     
     var body: some View {
-        let columns = Array(repeating: GridItem(), count: viewModel.boardSize)
-        
         GeometryReader { geometry in
-            let squareSize = geometry.size.width / CGFloat(viewModel.boardSize) + 1
+            let squareSize = geometry.size.width / CGFloat(viewModel.matrixSize) + 1
             
             LazyVGrid(columns: columns, spacing: 0) {
                 ForEach(viewModel.squares) { square in
                     let checker = viewModel.checker(at: square)
                     BoardSquare(color: viewModel.getSquareColor(square))
                         .frame(width: squareSize, height: squareSize)
-                        .clipped()
                         .overlay {
                             if let checker = viewModel.checker(at: square) {
                                 BoardChecker(
                                     color: checker.type == .wolf ? Color.yellow : Color.green,
                                     isHighlighted: viewModel.selectedChecker == checker
                                 )
-                                .offset(checker == viewModel.selectedChecker ? offset : .zero)
+                                .offset(checker == viewModel.selectedChecker ? dragOffset : .zero)
                             }
                         }
                         .zIndex(checker == viewModel.selectedChecker ? 1 : 0)
-                        .gesture(DragGesture()
+                        .gesture(DragGesture(coordinateSpace: .named("Board"))
                             .onChanged({ gesture in
                                 if let checker = viewModel.checker(at: square) {
                                     if viewModel.selectedChecker == nil {
                                         viewModel.select(checker)
                                     }
-                                    offset = gesture.translation
+                                    dragOffset = gesture.translation
                                 }
                             })
                             .onEnded({ gesture in
-                                offset = .zero
+                                dragOffset = .zero
                                 viewModel.select(nil)
-                                
-                                var dragEndLocation = gesture.location
-                                print("Drag ended at: \(dragEndLocation)")
-                                dragEndLocation.x -= (UIScreen.main.bounds.width - geometry.size.width) / 2
-                                dragEndLocation.y += geometry.size.height
-                                print("Drag ended at: \(dragEndLocation)")
-                                if let endSquare = viewModel.squareAtLocation(dragEndLocation) {
-                                    print("Drag ended on square: \(endSquare)")
+
+                                if let endSquare = squareAtLocation(
+                                    boardSize: geometry.size.width,
+                                    location: gesture.location
+                                ) {
                                     if let checker = checker, viewModel.canMove(checker, to: endSquare) {
                                         viewModel.move(checker, to: endSquare)
                                     }
@@ -64,6 +65,7 @@ struct ContentView: View {
                         )
                 }
             }
+            .coordinateSpace(name: "Board")
         }.frame(
             width: UIScreen.main.bounds.width * 0.9,
             height: UIScreen.main.bounds.width * 0.9

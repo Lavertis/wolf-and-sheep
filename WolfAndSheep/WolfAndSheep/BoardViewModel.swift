@@ -20,11 +20,7 @@ class BoardViewModel : ObservableObject {
     var checkers: Array<BoardModel.Checker> { model.checkers }
     var selectedChecker: BoardModel.Checker? { model.selectedChecker }
     
-    var boardSize: Int { return 8 }
-    var squareSize: CGFloat {
-        let width = UIScreen.main.bounds.width
-        return width / CGFloat(boardSize)
-    }
+    var matrixSize: Int { return 8 }
     
     func getSquareColor(_ square: BoardModel.Square) -> Color {
         if let selectedChecker = selectedChecker, model.canMove(selectedChecker, to: square) {
@@ -36,6 +32,10 @@ class BoardViewModel : ObservableObject {
     
     func checker(at square: BoardModel.Square) -> BoardModel.Checker? {
         return model.checker(at: square)
+    }
+    
+    func squareAt(row: Int, column: Int) -> BoardModel.Square? {
+        return model.squareAt(row: row, column: column)
     }
     
 //    func onSquareTap(_ square: BoardModel.Square) {
