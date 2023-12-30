@@ -19,7 +19,7 @@ struct ContentView: View {
         LazyVGrid(columns: columns, spacing: 0) {
             ForEach(viewModel.squares) { square in
                 BoardSquare(color: viewModel.getSquareColor(square))
-                .frame(width: squareSize(), height: squareSize())
+                .frame(width: squareSize, height: squareSize)
                 .clipped()
                 .overlay {
                     if let checker = viewModel.checker(at: square) {
@@ -38,7 +38,7 @@ struct ContentView: View {
         .cornerRadius(5)
     }
     
-    private func squareSize() -> CGFloat {
+    private var squareSize: CGFloat {
         let width = UIScreen.main.bounds.width
         return width / 8
     }
