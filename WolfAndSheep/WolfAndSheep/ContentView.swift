@@ -10,7 +10,7 @@ import SwiftUI
 
 
 struct ContentView: View {
-    @ObservedObject var viewModel : BoardViewModel
+    @ObservedObject var viewModel: BoardViewModel
     
     let boardPadding: CGFloat = 10
     let columns = Array(repeating: GridItem(), count: 8)
@@ -19,12 +19,16 @@ struct ContentView: View {
         LazyVGrid(columns: columns, spacing: 0) {
             ForEach(viewModel.squares) { square in
                 let color = (square.row + square.column).isMultiple(of: 2) ? Color.orange : Color.black
-                BoardSquare()
-                    .fill(color)
-                    .frame(
-                        width: squareSize(),
-                        height: squareSize()
-                    ).clipped()
+                let checker = viewModel.checker(at: square)
+                BoardSquare(
+                    color: color,
+                    checker: checker
+                )
+                .frame(width: squareSize(), height: squareSize())
+                .clipped()
+                .onTapGesture {
+                    viewModel.onSquareTap(square)
+                }
             }
         }
         .padding(boardPadding)
