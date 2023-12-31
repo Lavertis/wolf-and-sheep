@@ -56,6 +56,28 @@ struct BoardModel {
         return squares.first { $0.row == row && $0.column == column }
     }
     
+    func getGameStatus() -> GameStatus {
+        guard let wolfChecker = (checkers.first { $0.type == .wolf }) else {
+            fatalError("Wolf checker not found")
+        }
+        
+        if wolfChecker.row == 0 {
+            return .wolfWon
+        }
+        
+        let squaresWolfCanMoveTo = squares.filter { canMove(wolfChecker, to: $0) }
+        if squaresWolfCanMoveTo.isEmpty {
+            return .sheepWon
+        }
+        
+        return .inProgress
+    }
+    
+    mutating func resetGame() {
+        squares = createSquares()
+        checkers = createCheckers()
+    }
+    
     func canMove(_ checker: Checker, to square: Square) -> Bool {
         if (square.row + square.column).isMultiple(of: 2) {
             return false

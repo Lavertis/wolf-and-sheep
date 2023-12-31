@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F801886F2B41EF5200C4AA4E /* GameStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = F801886E2B41EF5200C4AA4E /* GameStatus.swift */; };
 		F88CC8F02B405132006242BD /* BoardChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88CC8EF2B405132006242BD /* BoardChecker.swift */; };
 		F8E2EC622B30B2DC00295264 /* WolfAndSheepApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E2EC612B30B2DC00295264 /* WolfAndSheepApp.swift */; };
 		F8E2EC642B30B2DC00295264 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E2EC632B30B2DC00295264 /* ContentView.swift */; };
@@ -19,6 +20,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F801886E2B41EF5200C4AA4E /* GameStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameStatus.swift; sourceTree = "<group>"; };
 		F88CC8EF2B405132006242BD /* BoardChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardChecker.swift; sourceTree = "<group>"; };
 		F8E2EC5E2B30B2DC00295264 /* WolfAndSheep.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WolfAndSheep.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8E2EC612B30B2DC00295264 /* WolfAndSheepApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WolfAndSheepApp.swift; sourceTree = "<group>"; };
@@ -70,6 +72,7 @@
 				F8E2EC752B30BA2300295264 /* BoardSquare.swift */,
 				F8E2EC772B30BCD000295264 /* CheckerType.swift */,
 				F88CC8EF2B405132006242BD /* BoardChecker.swift */,
+				F801886E2B41EF5200C4AA4E /* GameStatus.swift */,
 			);
 			path = WolfAndSheep;
 			sourceTree = "<group>";
@@ -153,6 +156,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F88CC8F02B405132006242BD /* BoardChecker.swift in Sources */,
+				F801886F2B41EF5200C4AA4E /* GameStatus.swift in Sources */,
 				F8E2EC642B30B2DC00295264 /* ContentView.swift in Sources */,
 				F8E2EC622B30B2DC00295264 /* WolfAndSheepApp.swift in Sources */,
 				F8E2EC782B30BCD000295264 /* CheckerType.swift in Sources */,

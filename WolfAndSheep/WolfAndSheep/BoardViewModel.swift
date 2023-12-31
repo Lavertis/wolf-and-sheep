@@ -53,4 +53,24 @@ class BoardViewModel : ObservableObject {
     func select(_ checker: BoardModel.Checker?) {
         model.select(checker)
     }
+    
+    func getGameStatus() -> GameStatus {
+        return model.getGameStatus()
+    }
+    
+    func getGameStatusMessage() -> String {
+        let gameStatus = getGameStatus()
+        return switch gameStatus {
+        case .wolfWon:
+            "Wolf has won"
+        case .sheepWon:
+            "Sheep have won"
+        case .inProgress:
+            "Game is in progress"
+        }
+    }
+    
+    func resetGame() {
+        return model.resetGame()
+    }
 }
