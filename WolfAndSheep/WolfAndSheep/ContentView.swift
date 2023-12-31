@@ -14,6 +14,9 @@ struct ContentView: View {
     @State private var dragOffset = CGSize.zero
     @State private var isAlertShown: Bool = false
     
+    @State private var rotateBoardAfterTurn = false
+    @State private var boardRotationAngle: Int = 0
+    
     let boardSize: CGFloat = UIScreen.main.bounds.width * 0.9
     let coordinateSpaceName: String = "Board"
     var columns: [GridItem] {
@@ -21,18 +24,32 @@ struct ContentView: View {
     }
     
     var body: some View {
-        GeometryReader { geometry in
-            LazyVGrid(columns: columns, spacing: 0) {
-                renderSquares(geometry: geometry)
+        VStack {
+            rotateAfterTurnCheckbox
+            
+            GeometryReader { geometry in
+                LazyVGrid(columns: columns, spacing: 0) {
+                    renderSquares(geometry: geometry)
+                }
+                .coordinateSpace(name: coordinateSpaceName)
+                .alert(
+                    isPresented: $isAlertShown,
+                    content: { gameResultAlert }
+                )
             }
-            .coordinateSpace(name: coordinateSpaceName)
-            .alert(
-                isPresented: $isAlertShown,
-                content: { gameResultAlert }
-            )
+            .frame(width: boardSize, height: boardSize)
+            .border(Color.black, width: 1)
+            .rotationEffect(.degrees(Double(boardRotationAngle)))
         }
-        .frame(width: boardSize, height: boardSize)
-        .border(Color.black, width: 1)
+    }
+    
+    private var rotateAfterTurnCheckbox: some View {
+        Toggle(
+            "Rotate board after turn",
+            isOn: $rotateBoardAfterTurn
+        )
+        .toggleStyle(SwitchToggleStyle(tint: .red))
+        .padding()
     }
     
     private var gameResultAlert: Alert {
@@ -43,6 +60,22 @@ struct ContentView: View {
                 viewModel.resetGame()
             }
         )
+    }
+    
+    func rotateBoard() {
+        guard rotateBoardAfterTurn else {
+            return
+        }
+        
+        let isBoardRotatedCorrectly = viewModel.turn == .wolf && boardRotationAngle == 0 ||
+        viewModel.turn == .sheep && boardRotationAngle == 180
+        guard !isBoardRotatedCorrectly else {
+            return
+        }
+        
+        withAnimation(.spring(duration: 1, bounce: 0.25).delay(0.25)) {
+            boardRotationAngle = (boardRotationAngle + 180) % 360
+        }
     }
     
     func renderSquares(geometry: GeometryProxy) -> some View {
@@ -58,13 +91,14 @@ struct ContentView: View {
                             color: viewModel.getCheckerColor(checker),
                             isHighlighted: viewModel.selectedChecker == checker
                         )
-                        .gesture(DragGesture(coordinateSpace: .named(coordinateSpaceName))
-                            .onChanged({ gesture in
-                                handleOnDragChange(gesture, square: square)
-                            })
-                            .onEnded({ gesture in
-                                handleOnDragEnd(gesture, boardSize: geometry.size.width, checker: checker)
-                            })
+                        .gesture(
+                            DragGesture(coordinateSpace: .named(coordinateSpaceName))
+                                .onChanged({ gesture in
+                                    handleOnDragChange(gesture, square: square)
+                                })
+                                .onEnded({ gesture in
+                                    handleOnDragEnd(gesture, boardSize: geometry.size.width, checker: checker)
+                                })
                         )
                         .offset(checker == viewModel.selectedChecker ? dragOffset : .zero)
                     }
@@ -98,10 +132,13 @@ struct ContentView: View {
         viewModel.select(nil)
         
         if let endSquare = squareAtLocation(boardSize: boardSize, location: gesture.location) {
-            if let checker = checker, viewModel.canMove(checker, to: endSquare)
+            if let checker = checker,
+               viewModel.canMove(checker, to: endSquare),
+               checker.type == viewModel.turn
             {
                 viewModel.move(checker, to: endSquare)
                 handleGameStatus()
+                rotateBoard()
             }
         }
     }
