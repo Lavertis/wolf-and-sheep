@@ -52,6 +52,10 @@ struct BoardModel {
         return checkers.first { $0.row == square.row && $0.column == square.column }
     }
     
+    func squareAt(row: Int, column: Int) -> Square? {
+        return squares.first { $0.row == row && $0.column == column }
+    }
+    
     func canMove(_ checker: Checker, to square: Square) -> Bool {
         if (square.row + square.column).isMultiple(of: 2) {
             return false

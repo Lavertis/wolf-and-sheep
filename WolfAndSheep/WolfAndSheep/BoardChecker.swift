@@ -29,8 +29,5 @@ struct BoardChecker: View {
 }
 
 #Preview {
-    BoardChecker(
-        color: .green,
-        isHighlighted: true
-    )
+    BoardChecker(color: .green, isHighlighted: true)
 }

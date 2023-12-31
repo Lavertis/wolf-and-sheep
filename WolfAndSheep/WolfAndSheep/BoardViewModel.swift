@@ -20,6 +20,8 @@ class BoardViewModel : ObservableObject {
     var checkers: Array<BoardModel.Checker> { model.checkers }
     var selectedChecker: BoardModel.Checker? { model.selectedChecker }
     
+    var matrixSize: Int { return 8 }
+    
     func getSquareColor(_ square: BoardModel.Square) -> Color {
         if let selectedChecker = selectedChecker, model.canMove(selectedChecker, to: square) {
             return Color.teal
@@ -28,37 +30,27 @@ class BoardViewModel : ObservableObject {
         }
     }
     
+    func getCheckerColor(_ checker: BoardModel.Checker) -> Color {
+        return checker.type == .wolf ? Color.yellow : Color.green
+    }
+    
     func checker(at square: BoardModel.Square) -> BoardModel.Checker? {
         return model.checker(at: square)
     }
     
-    func onSquareTap(_ square: BoardModel.Square) {
-        guard let selectedChecker = selectedChecker else {
-            select(checker(at: square))
-            return
-        }
-        
-        if selectedChecker.row == square.row && selectedChecker.column == square.column {
-            select(nil)
-            return
-        }
-        
-        if let newChecker = model.checkers.first(where: { $0.row == square.row && $0.column == square.column }) {
-            select(newChecker)
-            return
-        }
-        
-        if model.canMove(selectedChecker, to: square) {
-            move(selectedChecker, to: square)
-            select(nil)
-        }
+    func squareAt(row: Int, column: Int) -> BoardModel.Square? {
+        return model.squareAt(row: row, column: column)
     }
     
-    private func move(_ checker: BoardModel.Checker, to square: BoardModel.Square) {
+    func move(_ checker: BoardModel.Checker, to square: BoardModel.Square) {
         model.move(checker, to: square)
     }
     
-    private func select(_ checker: BoardModel.Checker?) {
+    func canMove(_ checker: BoardModel.Checker, to square: BoardModel.Square) -> Bool {
+        return model.canMove(checker, to: square)
+    }
+    
+    func select(_ checker: BoardModel.Checker?) {
         model.select(checker)
     }
 }
