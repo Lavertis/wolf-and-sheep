@@ -10,6 +10,7 @@ import Foundation
 struct BoardModel {
     private(set) var squares: Array<Square> = []
     private(set) var checkers: Array<Checker> = []
+    private(set) var turn: CheckerType = .wolf
     
     init() {
         squares = createSquares()
@@ -102,12 +103,22 @@ struct BoardModel {
     }
     
     mutating func move(_ checker: Checker, to square: Square) {
+        guard checker.type == turn else {
+            return
+        }
         if let index = checkers.firstIndex(of: checker) {
             checkers[index] = Checker(row: square.row, column: square.column, type: checker.type)
+            turn = turn == .wolf ? .sheep : .wolf
         }
     }
     
     mutating func select(_ checker: Checker?) {
+        if let checker = checker {
+            if checker.type != turn {
+                return
+            }
+        }
+        
         selectedChecker = checker
     }
     

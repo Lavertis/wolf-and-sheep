@@ -19,6 +19,7 @@ class BoardViewModel : ObservableObject {
     var squares: Array<BoardModel.Square> { model.squares }
     var checkers: Array<BoardModel.Checker> { model.checkers }
     var selectedChecker: BoardModel.Checker? { model.selectedChecker }
+    var turn: CheckerType { model.turn }
     
     var matrixSize: Int { return 8 }
     

@@ -98,7 +98,8 @@ struct ContentView: View {
         viewModel.select(nil)
         
         if let endSquare = squareAtLocation(boardSize: boardSize, location: gesture.location) {
-            if let checker = checker, viewModel.canMove(checker, to: endSquare) {
+            if let checker = checker, viewModel.canMove(checker, to: endSquare)
+            {
                 viewModel.move(checker, to: endSquare)
                 handleGameStatus()
             }
