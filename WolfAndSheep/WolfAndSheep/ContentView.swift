@@ -23,9 +23,10 @@ struct ContentView: View {
         VStack {
             score
             rotateAfterTurnCheckbox
+            resetGameButton
             Spacer()
             boardContainer
-            Spacer()
+            Spacer(minLength: 150)
         }
     }
     
@@ -37,6 +38,31 @@ struct ContentView: View {
         }
         .font(.title)
         .padding(.horizontal)
+    }
+    
+    private var rotateAfterTurnCheckbox: some View {
+        Toggle(
+            "Rotate board after turn",
+            isOn: $rotateBoardAfterTurn
+        )
+        .toggleStyle(SwitchToggleStyle(tint: .red))
+        .onChange(of: rotateBoardAfterTurn) {
+            rotateBoard()
+        }
+        .padding(.horizontal)
+    }
+    
+    private var resetGameButton: some View {
+        Button(action: {
+            viewModel.resetGame()
+        }) {
+            Text("Reset Game")
+                .padding()
+                .foregroundColor(.white)
+                .background(Color.blue)
+                .cornerRadius(10)
+        }
+        .padding()
     }
     
     private var boardContainer: some View {
@@ -85,18 +111,6 @@ struct ContentView: View {
                 }
                 .zIndex(checker == viewModel.selectedChecker ? 1 : 0)
         }
-    }
-    
-    private var rotateAfterTurnCheckbox: some View {
-        Toggle(
-            "Rotate board after turn",
-            isOn: $rotateBoardAfterTurn
-        )
-        .toggleStyle(SwitchToggleStyle(tint: .red))
-        .onChange(of: rotateBoardAfterTurn) {
-            rotateBoard()
-        }
-        .padding(.horizontal)
     }
     
     private var gameResultAlert: Alert {
