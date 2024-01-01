@@ -42,7 +42,7 @@ struct ContentView: View {
     
     private var rotateAfterTurnCheckbox: some View {
         Toggle(
-            "Rotate board after turn",
+            "Rotate board",
             isOn: $rotateBoardAfterTurn
         )
         .toggleStyle(SwitchToggleStyle(tint: .red))
@@ -54,7 +54,10 @@ struct ContentView: View {
     
     private var resetGameButton: some View {
         Button(action: {
-            viewModel.resetGame()
+            withAnimation {
+                boardRotationAngle = 0
+                viewModel.resetGame()
+            }
         }) {
             Text("Reset Game")
                 .padding()
