@@ -13,35 +13,18 @@ struct ContentView: View {
     @ObservedObject var viewModel: BoardViewModel
     @State private var dragOffset = CGSize.zero
     @State private var isAlertShown: Bool = false
-    
     @State private var rotateBoardAfterTurn = false
     @State private var boardRotationAngle: Int = 0
     
     let boardSize: CGFloat = UIScreen.main.bounds.width * 0.9
     let coordinateSpaceName: String = "Board"
     
-    var columns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 0), count: viewModel.matrixSize)
-    }
-    
     var body: some View {
         VStack {
             score
             rotateAfterTurnCheckbox
             Spacer()
-            GeometryReader { geometry in
-                LazyVGrid(columns: columns, spacing: 0) {
-                    renderSquares(geometry: geometry)
-                }
-                .coordinateSpace(name: coordinateSpaceName)
-                .alert(
-                    isPresented: $isAlertShown,
-                    content: { gameResultAlert }
-                )
-            }
-            .frame(width: boardSize, height: boardSize)
-            .border(Color.black, width: 1)
-            .rotationEffect(.degrees(Double(boardRotationAngle)))
+            boardContainer
             Spacer()
         }
     }
@@ -56,7 +39,26 @@ struct ContentView: View {
         .padding(.horizontal)
     }
     
-    func renderSquares(geometry: GeometryProxy) -> some View {
+    private var boardContainer: some View {
+        var columns: [GridItem] {
+            Array(repeating: GridItem(.flexible(), spacing: 0), count: viewModel.matrixSize)
+        }
+        return GeometryReader { geometry in
+            LazyVGrid(columns: columns, spacing: 0) {
+                renderBoardSquares(geometry: geometry)
+            }
+            .coordinateSpace(name: coordinateSpaceName)
+            .alert(
+                isPresented: $isAlertShown,
+                content: { gameResultAlert }
+            )
+        }
+        .frame(width: boardSize, height: boardSize)
+        .border(Color.black, width: 1)
+        .rotationEffect(.degrees(Double(boardRotationAngle)))
+    }
+    
+    func renderBoardSquares(geometry: GeometryProxy) -> some View {
         let squareSize = geometry.size.height / CGFloat(viewModel.matrixSize)
         
         return ForEach(viewModel.squares) { square in
