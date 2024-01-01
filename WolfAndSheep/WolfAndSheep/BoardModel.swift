@@ -7,6 +7,7 @@
 
 import Foundation
 
+
 struct BoardModel {
     private(set) var matrixSize: Int = 8
     private(set) var squares: Array<Square> = []
@@ -49,7 +50,8 @@ struct BoardModel {
     }
     
     private func createWolfChecker() -> Checker {
-        return Checker(row: matrixSize - 1, column: 0, type: .wolf)
+        let randomColumn = 2 * Int.random(in: 0..<(matrixSize / 2))
+        return Checker(row: matrixSize - 1, column: randomColumn, type: .wolf)
     }
     
     func checker(at square: BoardModel.Square) -> BoardModel.Checker? {
