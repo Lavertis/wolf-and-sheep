@@ -69,7 +69,7 @@ struct ContentView: View {
                     if let checker = checker {
                         BoardChecker(
                             color: viewModel.getCheckerColor(checker),
-                            isHighlighted: viewModel.selectedChecker == checker
+                            isHighlighted: viewModel.turn == checker.type
                         )
                         .gesture(
                             DragGesture(coordinateSpace: .named(coordinateSpaceName))

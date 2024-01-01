@@ -15,10 +15,7 @@ struct BoardChecker: View {
         GeometryReader { geometry in
             Circle()
                 .fill(color)
-                .stroke(
-                    isHighlighted ? Color.red : Color.clear,
-                    lineWidth: 5
-                )
+                .shadowWithStrength(color: .red, strength: isHighlighted ? 3 : 0)
                 .frame(
                     width: geometry.size.width * 0.8,
                     height: geometry.size.height * 0.8
