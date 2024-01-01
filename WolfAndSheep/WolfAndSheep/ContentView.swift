@@ -19,14 +19,16 @@ struct ContentView: View {
     
     let boardSize: CGFloat = UIScreen.main.bounds.width * 0.9
     let coordinateSpaceName: String = "Board"
+    
     var columns: [GridItem] {
         Array(repeating: GridItem(.flexible(), spacing: 0), count: viewModel.matrixSize)
     }
     
     var body: some View {
         VStack {
+            score
             rotateAfterTurnCheckbox
-            
+            Spacer()
             GeometryReader { geometry in
                 LazyVGrid(columns: columns, spacing: 0) {
                     renderSquares(geometry: geometry)
@@ -40,42 +42,18 @@ struct ContentView: View {
             .frame(width: boardSize, height: boardSize)
             .border(Color.black, width: 1)
             .rotationEffect(.degrees(Double(boardRotationAngle)))
+            Spacer()
         }
     }
     
-    private var rotateAfterTurnCheckbox: some View {
-        Toggle(
-            "Rotate board after turn",
-            isOn: $rotateBoardAfterTurn
-        )
-        .toggleStyle(SwitchToggleStyle(tint: .red))
-        .padding()
-    }
-    
-    private var gameResultAlert: Alert {
-        Alert(
-            title: Text("Game Over"),
-            message: Text(viewModel.getGameStatusMessage()),
-            dismissButton: .default(Text("Play Again")) {
-                viewModel.resetGame()
-            }
-        )
-    }
-    
-    func rotateBoard() {
-        guard rotateBoardAfterTurn else {
-            return
+    private var score: some View {
+        HStack {
+            Text("Wolf: \(viewModel.wolfScore)")
+            Spacer()
+            Text("Sheep: \(viewModel.sheepScore)")
         }
-        
-        let isBoardRotatedCorrectly = viewModel.turn == .wolf && boardRotationAngle == 0 ||
-        viewModel.turn == .sheep && boardRotationAngle == 180
-        guard !isBoardRotatedCorrectly else {
-            return
-        }
-        
-        withAnimation(.spring(duration: 1, bounce: 0.25).delay(0.25)) {
-            boardRotationAngle = (boardRotationAngle + 180) % 360
-        }
+        .font(.title)
+        .padding(.horizontal)
     }
     
     func renderSquares(geometry: GeometryProxy) -> some View {
@@ -104,6 +82,44 @@ struct ContentView: View {
                     }
                 }
                 .zIndex(checker == viewModel.selectedChecker ? 1 : 0)
+        }
+    }
+    
+    private var rotateAfterTurnCheckbox: some View {
+        Toggle(
+            "Rotate board after turn",
+            isOn: $rotateBoardAfterTurn
+        )
+        .toggleStyle(SwitchToggleStyle(tint: .red))
+        .onChange(of: rotateBoardAfterTurn) {
+            rotateBoard()
+        }
+        .padding(.horizontal)
+    }
+    
+    private var gameResultAlert: Alert {
+        Alert(
+            title: Text("Game Over"),
+            message: Text(viewModel.getGameStatusMessage()),
+            dismissButton: .default(Text("Play Again")) {
+                viewModel.resetGame()
+            }
+        )
+    }
+    
+    func rotateBoard() {
+        guard rotateBoardAfterTurn else {
+            return
+        }
+        
+        let isBoardRotatedCorrectly = viewModel.turn == .wolf && boardRotationAngle == 0 ||
+        viewModel.turn == .sheep && boardRotationAngle == 180
+        guard !isBoardRotatedCorrectly else {
+            return
+        }
+        
+        withAnimation(.spring(duration: 1, bounce: 0.25).delay(0.25)) {
+            boardRotationAngle = (boardRotationAngle + 180) % 360
         }
     }
     

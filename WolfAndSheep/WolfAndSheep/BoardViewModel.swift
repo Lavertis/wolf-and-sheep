@@ -20,8 +20,9 @@ class BoardViewModel : ObservableObject {
     var checkers: Array<BoardModel.Checker> { model.checkers }
     var selectedChecker: BoardModel.Checker? { model.selectedChecker }
     var turn: CheckerType { model.turn }
-    
-    var matrixSize: Int { return 8 }
+    var wolfScore: Int { model.wolfScore }
+    var sheepScore: Int { model.sheepScore }
+    var matrixSize: Int { model.matrixSize }
     
     func getSquareColor(_ square: BoardModel.Square) -> Color {
         if let selectedChecker = selectedChecker, model.canMove(selectedChecker, to: square) {

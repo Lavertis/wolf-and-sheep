@@ -8,9 +8,12 @@
 import Foundation
 
 struct BoardModel {
+    private(set) var matrixSize: Int = 8
     private(set) var squares: Array<Square> = []
     private(set) var checkers: Array<Checker> = []
     private(set) var turn: CheckerType = .wolf
+    private(set) var wolfScore: Int = 0
+    private(set) var sheepScore: Int = 0
     
     init() {
         squares = createSquares()
@@ -20,8 +23,8 @@ struct BoardModel {
     private func createSquares() -> Array<Square> {
         var squares = Array<Square>()
         
-        for row in 0 ..< 8 {
-            for column in 0 ..< 8 {
+        for row in 0 ..< matrixSize {
+            for column in 0 ..< matrixSize {
                 squares.append(Square(row: row, column: column))
             }
         }
@@ -38,7 +41,7 @@ struct BoardModel {
     private func createSheepCheckers() -> Array<Checker> {
         var checkers = Array<Checker>()
         
-        for column in stride(from: 1, to: 8, by: 2) {
+        for column in stride(from: 1, to: matrixSize, by: 2) {
             checkers.append(Checker(row: 0, column: column, type: .sheep))
         }
         
@@ -46,7 +49,7 @@ struct BoardModel {
     }
     
     private func createWolfChecker() -> Checker {
-        return Checker(row: 7, column: 0, type: .wolf)
+        return Checker(row: matrixSize - 1, column: 0, type: .wolf)
     }
     
     func checker(at square: BoardModel.Square) -> BoardModel.Checker? {
@@ -75,8 +78,19 @@ struct BoardModel {
     }
     
     mutating func resetGame() {
+        updateScore()
         squares = createSquares()
         checkers = createCheckers()
+        turn = .wolf
+    }
+    
+    mutating func updateScore() {
+        let gameStatus = getGameStatus()
+        if gameStatus == .sheepWon {
+            sheepScore += 1
+        } else if gameStatus == .wolfWon {
+            wolfScore += 1
+        }
     }
     
     func canMove(_ checker: Checker, to square: Square) -> Bool {
