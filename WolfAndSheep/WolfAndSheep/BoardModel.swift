@@ -81,7 +81,6 @@ struct BoardModel {
     
     mutating func resetGame() {
         updateScore()
-        squares = createSquares()
         checkers = createCheckers()
         turn = .wolf
     }

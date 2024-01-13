@@ -54,10 +54,10 @@ struct ContentView: View {
     
     private var resetGameButton: some View {
         Button(action: {
-            withAnimation {
+            withAnimation() {
                 boardRotationAngle = 0
-                viewModel.resetGame()
             }
+            viewModel.resetGame()
         }) {
             Text("Reset Game")
                 .padding()
@@ -73,8 +73,13 @@ struct ContentView: View {
             Array(repeating: GridItem(.flexible(), spacing: 0), count: viewModel.matrixSize)
         }
         return GeometryReader { geometry in
-            LazyVGrid(columns: columns, spacing: 0) {
-                renderBoardSquares(geometry: geometry)
+            ZStack {
+                LazyVGrid(columns: columns, spacing: 0) {
+                    renderBoardSquares(geometry: geometry)
+                }
+                LazyVGrid(columns: columns, spacing: 0) {
+                    renderBoardCheckers(geometry: geometry)
+                }
             }
             .coordinateSpace(name: coordinateSpaceName)
             .alert(
@@ -91,28 +96,36 @@ struct ContentView: View {
         let squareSize = geometry.size.height / CGFloat(viewModel.matrixSize)
         
         return ForEach(viewModel.squares) { square in
-            let checker = viewModel.checker(at: square)
             BoardSquare(color: viewModel.getSquareColor(square))
                 .frame(height: squareSize)
-                .overlay {
-                    if let checker = checker {
-                        BoardChecker(
-                            color: viewModel.getCheckerColor(checker),
-                            isHighlighted: viewModel.turn == checker.type
-                        )
-                        .gesture(
-                            DragGesture(coordinateSpace: .named(coordinateSpaceName))
-                                .onChanged({ gesture in
-                                    handleOnDragChange(gesture, square: square)
-                                })
-                                .onEnded({ gesture in
-                                    handleOnDragEnd(gesture, boardSize: geometry.size.width, checker: checker)
-                                })
-                        )
-                        .offset(checker == viewModel.selectedChecker ? dragOffset : .zero)
-                    }
-                }
-                .zIndex(checker == viewModel.selectedChecker ? 1 : 0)
+        }
+    }
+    
+    func renderBoardCheckers(geometry: GeometryProxy) -> some View {
+        let squareSize = geometry.size.height / CGFloat(viewModel.matrixSize)
+        
+        return ForEach(viewModel.squares) { square in
+            let checker = viewModel.checker(at: square)
+            if let checker = checker {
+                BoardChecker(
+                    color: viewModel.getCheckerColor(checker),
+                    isHighlighted: viewModel.turn == checker.type
+                )
+                .gesture(
+                    DragGesture(coordinateSpace: .named(coordinateSpaceName))
+                        .onChanged({ gesture in
+                            handleOnDragChange(gesture, checker: checker)
+                        })
+                        .onEnded({ gesture in
+                            handleOnDragEnd(gesture, boardSize: geometry.size.width, checker: checker)
+                        })
+                )
+                .offset(checker == viewModel.selectedChecker ? dragOffset : .zero)
+                .zIndex(checker == viewModel.selectedChecker ? 2 : 1)
+                .frame(height: squareSize)
+            } else {
+                Color.clear.frame(width: squareSize, height: squareSize)
+            }
         }
     }
     
@@ -149,8 +162,8 @@ struct ContentView: View {
         return viewModel.squareAt(row: row, column: column)
     }
     
-    func handleOnDragChange(_ gesture: DragGesture.Value, square: BoardModel.Square) {
-        if let checker = viewModel.checker(at: square) {
+    func handleOnDragChange(_ gesture: DragGesture.Value, checker: BoardModel.Checker?) {
+        if let checker = checker {
             if viewModel.selectedChecker == nil {
                 viewModel.select(checker)
             }
@@ -163,8 +176,10 @@ struct ContentView: View {
         boardSize: CGFloat,
         checker: BoardModel.Checker?
     ) {
-        dragOffset = .zero
-        viewModel.select(nil)
+        withAnimation {
+            dragOffset = .zero
+            viewModel.select(nil)
+        }
         
         if let endSquare = squareAtLocation(boardSize: boardSize, location: gesture.location) {
             if let checker = checker,
