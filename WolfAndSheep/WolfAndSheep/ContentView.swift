@@ -8,25 +8,23 @@
 import SwiftUI
 
 
-
 struct ContentView: View {
     @ObservedObject var viewModel: BoardViewModel
     @State private var dragOffset = CGSize.zero
     @State private var isAlertShown: Bool = false
-    @State private var rotateBoardAfterTurn = false
     @State private var boardRotationAngle: Int = 0
     
     let boardSize: CGFloat = UIScreen.main.bounds.width * 0.9
     let coordinateSpaceName: String = "Board"
-    
+        
     var body: some View {
         VStack {
             score
-            rotateAfterTurnCheckbox
             resetGameButton
             Spacer()
             boardContainer
-            Spacer(minLength: 150)
+            Spacer(minLength: 130)
+            rotateBoardButtons
         }
     }
     
@@ -40,30 +38,33 @@ struct ContentView: View {
         .padding(.horizontal)
     }
     
-    private var rotateAfterTurnCheckbox: some View {
-        Toggle(
-            "Rotate board",
-            isOn: $rotateBoardAfterTurn
-        )
-        .toggleStyle(SwitchToggleStyle(tint: .red))
-        .onChange(of: rotateBoardAfterTurn) {
-            rotateBoard()
+    private var rotateBoardButtons: some View {
+        HStack {
+            Button(action: {
+                changeBoardRotationAngle(by: -90)
+            }) {
+                Image(systemName: "arrow.counterclockwise")
+                    .transformIntoButton()
+            }
+
+            Button(action: {
+                changeBoardRotationAngle(by: 90)
+            }) {
+                Image(systemName: "arrow.clockwise")
+                    .transformIntoButton()
+            }
         }
-        .padding(.horizontal)
     }
     
     private var resetGameButton: some View {
         Button(action: {
+            changeBoardRotationAngle(to: 0)
             withAnimation() {
-                boardRotationAngle = 0
+                viewModel.resetGame()
             }
-            viewModel.resetGame()
         }) {
-            Text("Reset Game")
-                .padding()
-                .foregroundColor(.white)
-                .background(Color.blue)
-                .cornerRadius(10)
+            Text("Reset round")
+                .transformIntoButton()
         }
         .padding()
     }
@@ -92,22 +93,22 @@ struct ContentView: View {
         .rotationEffect(.degrees(Double(boardRotationAngle)))
     }
     
-    func renderBoardSquares(geometry: GeometryProxy) -> some View {
+    private func renderBoardSquares(geometry: GeometryProxy) -> some View {
         let squareSize = geometry.size.height / CGFloat(viewModel.matrixSize)
         
         return ForEach(viewModel.squares) { square in
-            BoardSquare(color: viewModel.getSquareColor(square))
+            BoardSquareView(color: viewModel.getSquareColor(square))
                 .frame(height: squareSize)
         }
     }
     
-    func renderBoardCheckers(geometry: GeometryProxy) -> some View {
+    private func renderBoardCheckers(geometry: GeometryProxy) -> some View {
         let squareSize = geometry.size.height / CGFloat(viewModel.matrixSize)
         
         return ForEach(viewModel.squares) { square in
             let checker = viewModel.checker(at: square)
             if let checker = checker {
-                BoardChecker(
+                CheckerView(
                     color: viewModel.getCheckerColor(checker),
                     isHighlighted: viewModel.turn == checker.type
                 )
@@ -139,30 +140,14 @@ struct ContentView: View {
         )
     }
     
-    func rotateBoard() {
-        guard rotateBoardAfterTurn else {
-            return
-        }
-        
-        let isBoardRotatedCorrectly = viewModel.turn == .wolf && boardRotationAngle == 0 ||
-        viewModel.turn == .sheep && boardRotationAngle == 180
-        guard !isBoardRotatedCorrectly else {
-            return
-        }
-        
-        withAnimation(.spring(duration: 1, bounce: 0.25).delay(0.25)) {
-            boardRotationAngle = (boardRotationAngle + 180) % 360
-        }
-    }
-    
-    func squareAtLocation(boardSize: CGFloat, location: CGPoint) -> BoardModel.Square? {
+    private func squareAtLocation(boardSize: CGFloat, location: CGPoint) -> BoardModel.Square? {
         let squareSize = boardSize / CGFloat(viewModel.matrixSize)
         let column = Int(location.x / squareSize)
         let row = Int(location.y / squareSize)
         return viewModel.squareAt(row: row, column: column)
     }
     
-    func handleOnDragChange(_ gesture: DragGesture.Value, checker: BoardModel.Checker?) {
+    private func handleOnDragChange(_ gesture: DragGesture.Value, checker: BoardModel.Checker?) {
         if let checker = checker {
             if viewModel.selectedChecker == nil {
                 viewModel.select(checker)
@@ -171,7 +156,7 @@ struct ContentView: View {
         }
     }
     
-    func handleOnDragEnd(
+    private func handleOnDragEnd(
         _ gesture: DragGesture.Value,
         boardSize: CGFloat,
         checker: BoardModel.Checker?
@@ -187,21 +172,23 @@ struct ContentView: View {
                checker.type == viewModel.turn
             {
                 viewModel.move(checker, to: endSquare)
-                handleGameStatus()
-                rotateBoard()
+                if viewModel.isGameOver {
+                    isAlertShown = true
+                }
             }
         }
     }
     
-    func handleGameStatus() {
-        let gameStatus = viewModel.getGameStatus()
-        switch gameStatus {
-        case .wolfWon:
-            isAlertShown = true
-        case .sheepWon:
-            isAlertShown = true
-        case .inProgress:
-            do {}
+    private func changeBoardRotationAngle(to toDegrees: Int? = nil, by byDegrees: Int? = nil) {
+        withAnimation(.spring(duration: 1, bounce: 0.25)) {
+            if toDegrees != nil && byDegrees != nil {
+                fatalError("Cannot set both toDegrees and byDegrees")
+            }
+            if let toDegrees = toDegrees {
+                boardRotationAngle = toDegrees
+            } else if let byDegrees = byDegrees {
+                boardRotationAngle += byDegrees
+            }
         }
     }
 }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct BoardChecker: View {
+struct CheckerView: View {
     var color: Color
     var isHighlighted: Bool
     
@@ -26,5 +26,5 @@ struct BoardChecker: View {
 }
 
 #Preview {
-    BoardChecker(color: .green, isHighlighted: true)
+    CheckerView(color: .green, isHighlighted: true)
 }

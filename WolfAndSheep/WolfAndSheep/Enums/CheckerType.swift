@@ -7,6 +7,7 @@
 
 import Foundation
 
+
 enum CheckerType {
     case wolf
     case sheep

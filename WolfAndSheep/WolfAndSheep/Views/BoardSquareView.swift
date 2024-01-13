@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct BoardSquare: View {
+struct BoardSquareView: View {
     var color: Color
 
     var body: some View {
@@ -18,5 +18,5 @@ struct BoardSquare: View {
 
 
 #Preview {
-    BoardSquare(color: Color.orange)
+    BoardSquareView(color: Color.orange)
 }
