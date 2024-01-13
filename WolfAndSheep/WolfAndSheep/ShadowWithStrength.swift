@@ -13,9 +13,9 @@ struct ShadowWithStrength: ViewModifier {
 
     func body(content: Content) -> some View {
         if strength == 0 {
-            return content
+            content
         }
-        return ForEach(0..<strength, id: \.self) { _ in
+        ForEach(0..<strength, id: \.self) { _ in
             content.shadow(color: color, radius: 5)
         }
     }
